@@ -77,7 +77,7 @@ export default class BookRequestScreen extends React.Component {
             onPress={() => {
               this.addRequest(this.state.bookName, this.state.reasonToRequest);
             }}
-          >
+>
             <Text>Request Book</Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>

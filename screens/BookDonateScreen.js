@@ -41,18 +41,19 @@ export default class BookDonateScreen extends React.Component {
   }
 
   componentWillUnmount() {
-    this.requestRef = null;
+    this.requestRef();
   }
 
   keyExtractor = (item, index) => index.toString();
 
   renderItem = ({ item, index }) => {
+    console.log(item)
     return (
       <ListItem key={index} bottomDivider>
         <ListItem.Content>
           <ListItem.Title>{item.bookName}</ListItem.Title>
           <ListItem.Subtitle>{item.reasonToRequest}</ListItem.Subtitle>
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress = {() => {this.props.navigation.navigate("ReceiverDetails", {"details": item})}}>
             <Text style={{ color: "#FFFFFF" }}>View</Text>
           </TouchableOpacity>
         </ListItem.Content>
@@ -63,7 +64,7 @@ export default class BookDonateScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <MyHeader title={"Donate Book"} />
+        <MyHeader title={"Donate Book"} navigation={this.props.navigation}/>
         <View style={{ flex: 1 }}>
           {this.state.requestedBooksList.length == 0 ? (
             <View style={styles.subContainer}>
