@@ -51,7 +51,7 @@ export default class BookRequestScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <MyHeader title={"Request Book"} />
+        <MyHeader title={"Request Book"} navigation={this.props.navigation}/>
         <KeyboardAvoidingView style={styles.keyBoardStyle}>
           <TextInput
             style={styles.formTextInput}
@@ -77,7 +77,7 @@ export default class BookRequestScreen extends React.Component {
             onPress={() => {
               this.addRequest(this.state.bookName, this.state.reasonToRequest);
             }}
-          >
+>
             <Text>Request Book</Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>

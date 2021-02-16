@@ -18,26 +18,36 @@ import { ListItem } from "react-native-elements";
 import db from "../config";
 import firebase from "firebase";
 
-export default class BookDonateScreen extends React.Component {
+export default class NotificationScreen extends React.Component {
   constructor() {
     super();
     this.state = {
-      requestedBooksList: [],
+      allNotifications: [],
+      userID: firebase.auth().currentUser.email,
     };
     this.requestRef = null;
   }
 
-  getRequestedBooksList = () => {
-    this.requestRef = db.collection("requestedBooks").onSnapshot((Snapshot) => {
-      var requestedBooksList = Snapshot.docs.map((document) => document.data());
-      this.setState({
-        requestedBooksList: requestedBooksList,
+  getAllNotifications = () => {
+    this.requestRef = db
+      .collection("allNotifications")
+      .where("notificationStatus", "==", "unread")
+      .where("targetedUserID", "==", this.state.userID)
+      .onSnapshot((Snapshot) => {
+        var allNotifications = [];
+        Snapshot.docs.map((doc) => {
+          var notification = doc.data();
+          notification["docID"] = doc.id;
+          allNotifications.push(notification);
+        });
+        this.setState({
+          allNotifications: allNotifications,
+        });
       });
-    });
   };
 
   componentDidMount() {
-    this.getRequestedBooksList();
+    this.getAllNotifications();
   }
 
   componentWillUnmount() {
@@ -47,15 +57,11 @@ export default class BookDonateScreen extends React.Component {
   keyExtractor = (item, index) => index.toString();
 
   renderItem = ({ item, index }) => {
-    console.log(item)
     return (
       <ListItem key={index} bottomDivider>
         <ListItem.Content>
           <ListItem.Title>{item.bookName}</ListItem.Title>
-          <ListItem.Subtitle>{item.reasonToRequest}</ListItem.Subtitle>
-          <TouchableOpacity style={styles.button} onPress = {() => {this.props.navigation.navigate("ReceiverDetails", {"details": item})}}>
-            <Text style={{ color: "#FFFFFF" }}>View</Text>
-          </TouchableOpacity>
+          <ListItem.Subtitle>{item.message}</ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>
     );
@@ -64,15 +70,15 @@ export default class BookDonateScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <MyHeader title={"Donate Book"} navigation={this.props.navigation}/>
+        <MyHeader title={"My Notifications"} navigation = {this.props.navigation}/>
         <View style={{ flex: 1 }}>
-          {this.state.requestedBooksList.length == 0 ? (
+          {this.state.allNotifications.length == 0 ? (
             <View style={styles.subContainer}>
-              <Text style={{ fontSize: 20 }}>List Of All Requested Books</Text>
+              <Text style={{ fontSize: 20 }}>List Of All Notifications</Text>
             </View>
           ) : (
             <FlatList
-              data={this.state.requestedBooksList}
+              data={this.state.allNotifications}
               keyExtractor={this.keyExtractor}
               renderItem={this.renderItem}
             ></FlatList>

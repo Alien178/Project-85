@@ -3,10 +3,11 @@ import { Image } from "react-native";
 import BookDonateScreen from "../screens/BookDonateScreen";
 import BookRequestScreen from "../screens/BookRequestScreen";
 import { createBottomTabNavigator } from "react-navigation-tabs";
+import { AppStackNavigator } from "./AppStackNavigator";
 
 export const AppTabNavigator = createBottomTabNavigator({
   DonateBook: {
-    screen: BookDonateScreen,
+    screen: AppStackNavigator,
     navigationOptions: {
       tabBarIcon: (
         <Image
