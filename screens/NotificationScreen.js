@@ -15,6 +15,7 @@ import {
   ScrollView,
 } from "react-native";
 import { ListItem } from "react-native-elements";
+import SwipeableFlatList from "../components/SwipeableFlatList";
 import db from "../config";
 import firebase from "firebase";
 
@@ -70,18 +71,17 @@ export default class NotificationScreen extends React.Component {
   render() {
     return (
       <View style={{ flex: 1 }}>
-        <MyHeader title={"My Notifications"} navigation = {this.props.navigation}/>
+        <MyHeader
+          title={"My Notifications"}
+          navigation={this.props.navigation}
+        />
         <View style={{ flex: 1 }}>
           {this.state.allNotifications.length == 0 ? (
             <View style={styles.subContainer}>
               <Text style={{ fontSize: 20 }}>List Of All Notifications</Text>
             </View>
           ) : (
-            <FlatList
-              data={this.state.allNotifications}
-              keyExtractor={this.keyExtractor}
-              renderItem={this.renderItem}
-            ></FlatList>
+            <SwipeableFlatList allNotification={this.state.allNotifications} />
           )}
         </View>
       </View>
