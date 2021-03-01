@@ -51,7 +51,7 @@ export default class SwipeableFlatList extends React.Component {
     <Animated.View>
       <ListItem bottomDivider>
         <ListItem.Content>
-          <ListItem.Title>{data.item.bookName}</ListItem.Title>
+          <ListItem.Title>{data.item.itemName}</ListItem.Title>
           <ListItem.Subtitle>{data.item.message}</ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>

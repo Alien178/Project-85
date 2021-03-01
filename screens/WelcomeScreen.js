@@ -1,18 +1,18 @@
-import React from "react";
+import * as React from "react";
 import {
-  Text,
   View,
-  TouchableOpacity,
   StyleSheet,
+  Text,
   Image,
+  TouchableOpacity,
   TextInput,
-  KeyboardAvoidingView,
-  ToastAndroid,
   Alert,
-  FlatList,
   Modal,
   ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+
 import db from "../config";
 import firebase from "firebase";
 
@@ -20,226 +20,287 @@ export default class WelcomeScreen extends React.Component {
   constructor() {
     super();
     this.state = {
-      emailID: "",
+      username: "",
       password: "",
-      confirmPassword: "",
+      isVisible: false,
       firstName: "",
       lastName: "",
-      contact: "",
+      mobileNumber: "",
       address: "",
-      isModalVisible: false,
+      confirmPassword: "",
+      currencyCode: "",
     };
   }
 
-  userLogin = async (emailID, password) => {
+  userLogin = (username, password) => {
     firebase
       .auth()
-      .signInWithEmailAndPassword(emailID, password)
+      .signInWithEmailAndPassword(username, password)
       .then(() => {
-        this.props.navigation.navigate("DonateBook")
+        this.props.navigation.navigate("HomeScreen");
       })
       .catch((error) => {
-        var errorCode = error.error;
+        var errorCode = error.code;
         var errorMessage = error.message;
-        console.log(errorMessage);
+        return Alert.alert(errorMessage);
       });
   };
 
-  userSignUp = async (emailID, password, confirmPassword) => {
-    if (password != confirmPassword) {
-      return Alert.alert("Passwords do not match!");
+  userSignUp = (username, password, confirmPassword) => {
+    if (password !== confirmPassword) {
+      return Alert.alert("password doesn't match\nCheck your password.");
     } else {
       firebase
         .auth()
-        .createUserWithEmailAndPassword(emailID, password)
-        .then(() => {
+        .createUserWithEmailAndPassword(username, password)
+        .then((response) => {
           db.collection("users").add({
             firstName: this.state.firstName,
             lastName: this.state.lastName,
+            mobileNumber: this.state.mobileNumber,
+            username: this.state.username,
             address: this.state.address,
-            contact: this.state.contact,
-            emailID: this.state.emailID,
+            currencyCode: this.state.currencyCode,
           });
-          return Alert.alert("User Sign Up Successful!!", "", [
-            {
-              text: "Ok",
-              onPress: () => {
-                this.setState({ isModalVisible: false });
-              },
-            },
+          return Alert.alert("User Added Successfully", "", [
+            { text: "OK", onPress: () => this.setState({ isVisible: false }) },
           ]);
         })
-        .catch((error) => {
-          var errorCode = error.error;
+        .catch(function (error) {
+          // Handle Errors here.
+          var errorCode = error.code;
           var errorMessage = error.message;
-          console.log(errorMessage);
+          return Alert.alert(errorMessage);
         });
     }
   };
 
-  showModal = () => {
-    return (
-      <Modal
-        animationType={"slide"}
-        transparent={true}
-        visible={this.state.isModalVisible}
-      >
-        <View style={styles.modalContainer}>
-          <ScrollView style={{ width: "100%" }}>
-            <KeyboardAvoidingView style={styles.KeyboardAvoidingView}>
-              <Text style={styles.modalTitle}>Sign Up</Text>
-              <TextInput
-                style={styles.formTextInput}
-                placeholder="First Name"
-                maxLength={8}
-                onChangeText={(text) => {
-                  this.setState({
-                    firstName: text,
-                  });
+  showModal = () => (
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={this.state.isVisible}
+    >
+      <View style={{ flex: 1, backgroundColor: "#fff" }}>
+        <ScrollView style={{ width: "100%" }}>
+          <View
+            style={{
+              flex: 0.2,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: RFValue(20),
+                fontWeight: "bold",
+                color: "#32867d",
+              }}
+            >
+              {" "}
+              SIGN UP{" "}
+            </Text>
+          </View>
+          <View style={{ flex: 0.95 }}>
+            <TextInput
+              style={styles.formTextInput}
+              placeholder={"First Name"}
+              maxLength={8}
+              onChangeText={(text) => {
+                this.setState({
+                  firstName: text,
+                });
+              }}
+            />
+            <TextInput
+              style={styles.formTextInput}
+              placeholder={"Last Name"}
+              maxLength={8}
+              onChangeText={(text) => {
+                this.setState({
+                  lastName: text,
+                });
+              }}
+            />
+            <TextInput
+              style={styles.formTextInput}
+              placeholder={"Mobile Number"}
+              maxLength={10}
+              keyboardType={"numeric"}
+              onChangeText={(text) => {
+                this.setState({
+                  mobileNumber: text,
+                });
+              }}
+            />
+            <TextInput
+              style={styles.formTextInput}
+              placeholder={"Address"}
+              multiline={true}
+              onChangeText={(text) => {
+                this.setState({
+                  address: text,
+                });
+              }}
+            />
+            <TextInput
+              style={styles.formTextInput}
+              placeholder={"Username"}
+              keyboardType={"email-address"}
+              onChangeText={(text) => {
+                this.setState({
+                  username: text,
+                });
+              }}
+            />
+            <TextInput
+              style={styles.formTextInput}
+              placeholder={"Password"}
+              secureTextEntry={true}
+              onChangeText={(text) => {
+                this.setState({
+                  password: text,
+                });
+              }}
+            />
+            <TextInput
+              style={styles.formTextInput}
+              placeholder={"Confrim Password"}
+              secureTextEntry={true}
+              onChangeText={(text) => {
+                this.setState({
+                  confirmPassword: text,
+                });
+              }}
+            />
+            <TextInput
+              style={styles.formTextInput}
+              placeholder={"Country currency code"}
+              maxLength={8}
+              onChangeText={(text) => {
+                this.setState({
+                  currencyCode: text,
+                });
+              }}
+            />
+          </View>
+          <View style={{ flex: 0.2, alignItems: "center" }}>
+            <TouchableOpacity
+              style={styles.registerButton}
+              onPress={() =>
+                this.userSignUp(
+                  this.state.username,
+                  this.state.password,
+                  this.state.confirmPassword
+                )
+              }
+            >
+              <Text style={styles.registerButtonText}>Register</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => this.setState({ isVisible: false })}
+            >
+              <Text
+                style={{
+                  fontSize: RFValue(20),
+                  fontWeight: "bold",
+                  color: "#32867d",
+                  marginTop: RFValue(10),
                 }}
-              ></TextInput>
-              <TextInput
-                style={styles.formTextInput}
-                placeholder="Last Name"
-                maxLength={8}
-                onChangeText={(text) => {
-                  this.setState({
-                    lastName: text,
-                  });
-                }}
-              ></TextInput>
-              <TextInput
-                style={styles.formTextInput}
-                placeholder="Contact"
-                maxLength={10}
-                keyboardType={"numeric"}
-                onChangeText={(text) => {
-                  this.setState({
-                    contact: text,
-                  });
-                }}
-              ></TextInput>
-              <TextInput
-                style={styles.formTextInput}
-                placeholder="Address"
-                multiline={true}
-                onChangeText={(text) => {
-                  this.setState({
-                    address: text,
-                  });
-                }}
-              ></TextInput>
-              <TextInput
-                placeholder={"Email ID"}
-                style={styles.formTextInput}
-                keyboardType={"email-address"}
-                onChangeText={(text) => {
-                  this.setState({
-                    emailID: text,
-                  });
-                }}
-              ></TextInput>
-              <TextInput
-                placeholder={"Password"}
-                style={styles.formTextInput}
-                secureTextEntry={true}
-                onChangeText={(text) => {
-                  this.setState({
-                    password: text,
-                  });
-                }}
-              ></TextInput>
-              <TextInput
-                placeholder={"Confirm Password"}
-                style={styles.formTextInput}
-                secureTextEntry={true}
-                onChangeText={(text) => {
-                  this.setState({
-                    confirmPassword: text,
-                  });
-                }}
-              ></TextInput>
-              <View>
-                <TouchableOpacity
-                  style={styles.registerButton}
-                  onPress={() => {
-                    this.userSignUp(
-                      this.state.emailID,
-                      this.state.password,
-                      this.state.confirmPassword
-                    );
-                  }}
-                >
-                  <Text style={styles.registerButtonText}>Sign Up</Text>
-                </TouchableOpacity>
-              </View>
-              <View>
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => {
-                    this.setState({ isModalVisible: false });
-                  }}
-                >
-                  <Text style={styles.registerButtonText}>Cancel</Text>
-                </TouchableOpacity>
-              </View>
-            </KeyboardAvoidingView>
-          </ScrollView>
-        </View>
-      </Modal>
-    );
-  };
+              >
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
+    </Modal>
+  );
 
   render() {
     return (
       <View style={styles.container}>
-        {this.showModal()}
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
+          {this.showModal()}
+        </View>
         <View style={styles.profileContainer}>
           <Image
-            source={require("../assets/bookSanta.png")}
-            style={{ width: 200, height: 200 }}
+            source={require("../assets/welcomeLogo.png")}
+            style={{ width: 150, height: 150 }}
           />
-          <Text style={styles.title}>Book Santa</Text>
+          <Text style={styles.title}>Barter App</Text>
         </View>
-        <View>
-          <TextInput
-            placeholder={"Email ID"}
-            placeholderTextColor={"#ffffff"}
-            style={styles.loginBox}
-            keyboardType={"email-address"}
-            onChangeText={(text) => {
-              this.setState({
-                emailID: text,
-              });
-            }}
-          ></TextInput>
-          <TextInput
-            placeholder={"Password"}
-            placeholderTextColor={"#ffffff"}
-            style={styles.loginBox}
-            secureTextEntry={true}
-            onChangeText={(text) => {
-              this.setState({
-                password: text,
-              });
-            }}
-          ></TextInput>
-          <TouchableOpacity
-            style={[styles.button, { marginTop: 20, marginBottom: 20 }]}
-            onPress={() => {
-              this.userLogin(this.state.emailID, this.state.password);
+        <View style={styles.buttonContainer}>
+          <Text
+            style={{
+              color: "#32867d",
+              fontSize: 18,
+              fontWeight: "bold",
+              marginLeft: 55,
             }}
           >
-            <Text style={styles.buttonText}>Login</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              this.setState({ isModalVisible: true });
+            USERNAME
+          </Text>
+          <View style={{ alignItems: "center" }}>
+            <TextInput
+              style={styles.loginBox}
+              keyboardType={"email-address"}
+              onChangeText={(text) => {
+                this.setState({
+                  username: text,
+                });
+              }}
+            />
+          </View>
+          <Text
+            style={{
+              color: "#32867d",
+              fontSize: 18,
+              fontWeight: "bold",
+              marginLeft: 55,
             }}
           >
-            <Text style={styles.buttonText}>Sign Up</Text>
-          </TouchableOpacity>
+            PASSWORD
+          </Text>
+          <View style={{ alignItems: "center" }}>
+            <TextInput
+              style={styles.loginBox}
+              secureTextEntry={true}
+              onChangeText={(text) => {
+                this.setState({
+                  password: text,
+                });
+              }}
+            />
+          </View>
+          <View style={{ alignItems: "center" }}>
+            <TouchableOpacity
+              style={[styles.button, { marginBottom: 10 }]}
+              onPress={() => {
+                this.userLogin(this.state.username, this.state.password);
+              }}
+            >
+              <Text
+                style={{ color: "#32867d", fontSize: 18, fontWeight: "bold" }}
+              >
+                LOGIN
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => {
+                this.setState({ isVisible: true });
+              }}
+            >
+              <Text
+                style={{ color: "#32867d", fontSize: 18, fontWeight: "bold" }}
+              >
+                SIGN UP
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -249,40 +310,39 @@ export default class WelcomeScreen extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8BE85",
-    alignItems: "center",
-    justifyContent: "center",
+    backgroundColor: "#6fc0b8",
   },
   profileContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 65,
-    fontWeight: "300",
-    paddingBottom: 10,
-    color: "#ff3d00",
-  },
-  loginBox: {
-    width: 300,
-    height: 40,
-    borderBottomWidth: 1.5,
-    borderColor: "#ff8a65",
-    fontSize: 20,
-    margin: 10,
-    paddingLeft: 10,
-  },
-  KeyboardAvoidingView: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  modalTitle: {
+  title: {
+    fontSize: 60,
+    fontWeight: "300",
+    // fontFamily:'AvenirNext-Heavy',
+    color: "#32867d",
+  },
+  loginBox: {
+    width: 300,
+    height: 35,
+    borderBottomWidth: 1.5,
+    borderColor: "#32867d",
+    fontSize: 20,
+    marginBottom: 20,
+    marginTop: 5,
+  },
+  button: {
+    width: "75%",
+    height: 50,
     justifyContent: "center",
-    alignSelf: "center",
-    fontSize: 30,
-    color: "#ff5722",
-    margin: 25,
+    alignItems: "center",
+    borderRadius: 25,
+    backgroundColor: "#ffff",
+    elevation: 10,
+  },
+  buttonContainer: {
+    flex: 1,
   },
   modalContainer: {
     flex: 1,
@@ -296,28 +356,38 @@ const styles = StyleSheet.create({
     marginBottom: 80,
   },
   formTextInput: {
-    width: "75%",
-    height: 35,
-    alignSelf: "center",
-    borderColor: "#ffab91",
-    borderRadius: 10,
+    width: "90%",
+    height: RFValue(45),
+    padding: RFValue(10),
     borderWidth: 1,
-    marginTop: 10,
-    padding: 10,
+    borderRadius: 2,
+    borderColor: "grey",
+    paddingBottom: RFValue(10),
+    marginLeft: RFValue(20),
+    marginBottom: RFValue(14),
   },
   registerButton: {
-    width: 200,
-    height: 40,
-    alignItems: "center",
+    width: "85%",
+    height: RFValue(50),
+    marginTop: RFValue(20),
     justifyContent: "center",
-    borderWidth: 1,
-    borderRadius: 10,
-    marginTop: 30,
+    alignItems: "center",
+    borderRadius: RFValue(3),
+    backgroundColor: "#32867d",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.44,
+    shadowRadius: 10.32,
+    elevation: 16,
+    marginTop: RFValue(10),
   },
   registerButtonText: {
-    color: "#ff5722",
-    fontSize: 15,
+    fontSize: RFValue(23),
     fontWeight: "bold",
+    color: "#fff",
   },
   cancelButton: {
     width: 200,
@@ -325,27 +395,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 5,
-  },
-  button: {
-    width: 300,
-    height: 50,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 25,
-    backgroundColor: "#ff9800",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 10.32,
-    elevation: 16,
-    padding: 10,
-  },
-  buttonText: {
-    color: "#ffff",
-    fontWeight: "200",
-    fontSize: 20,
   },
 });

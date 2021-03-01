@@ -61,7 +61,7 @@ export default class NotificationScreen extends React.Component {
     return (
       <ListItem key={index} bottomDivider>
         <ListItem.Content>
-          <ListItem.Title>{item.bookName}</ListItem.Title>
+          <ListItem.Title>{item.itemName}</ListItem.Title>
           <ListItem.Subtitle>{item.message}</ListItem.Subtitle>
         </ListItem.Content>
       </ListItem>

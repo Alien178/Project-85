@@ -1,25 +1,40 @@
-import React from 'react';
-import { createStackNavigator } from 'react-navigation-stack';
+import * as React from "react";
+import { createStackNavigator } from "react-navigation-stack";
+import HomeScreen from "../screens/HomeScreen";
+import ReceiverDetailsScreen from "../screens/ReceiverDetailsScreen";
+import NotificationScreen from "../screens/NotificationScreen";
+import MyReceivedBartersScreen from "../screens/MyReceivedBartersScreen";
 
-import BookDonateScreen from '../screens/BookDonateScreen';
-import ReceiverDetailScreen  from '../screens/ReceiverDetailScreen';
-
-export const AppStackNavigator = createStackNavigator({
-  BookDonateList : {
-    screen : BookDonateScreen,
-    navigationOptions:{
-      headerShown : false
-    }
-  },
-  ReceiverDetails : {
-    screen : ReceiverDetailScreen,
-    navigationOptions:{
-      headerShown : false
-    }
-  },
-
-},
+export const AppStackNavigator = createStackNavigator(
   {
-    initialRouteName: 'BookDonateList'
+    BarterList: {
+      screen: HomeScreen,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+
+    ReceiverDetails: {
+      screen: ReceiverDetailsScreen,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    Notification: {
+      screen: NotificationScreen,
+      navigationOptions: {
+        headerShown: false,
+      },
+    },
+    ReceivedBarters: {
+      screen: MyReceivedBartersScreen,
+      navigationOptions: {
+        headerShown: false
+      }
+    }
+  },
+
+  {
+    initialRouteName: "BarterList",
   }
 );

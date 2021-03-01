@@ -1,18 +1,16 @@
-import React from "react";
+import * as React from "react";
 import {
-  Text,
   View,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  TextInput,
+  Text,
   KeyboardAvoidingView,
-  Alert,
+  TextInput,
+  StyleSheet,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
+import MyHeader from "../components/MyHeader";
 import db from "../config";
 import firebase from "firebase";
-import MyHeader from "../components/MyHeader";
 
 export default class SettingScreen extends React.Component {
   constructor() {
@@ -21,74 +19,77 @@ export default class SettingScreen extends React.Component {
       emailID: "",
       firstName: "",
       lastName: "",
-      contact: "",
       address: "",
+      contact: "",
       docID: "",
     };
   }
 
-  getUserDetails = () => {
-    var email = firebase.auth().currentUser.email;
+  getData() {
+    var user = firebase.auth().currentUser;
+    var email = user.email;
+
     db.collection("users")
-      .where("emailID", "==", email)
+      .where("username", "==", email)
       .get()
       .then((snapshot) => {
         snapshot.forEach((doc) => {
           var data = doc.data();
           this.setState({
-            emailID: data.emailID,
+            emailID: data.username,
             firstName: data.firstName,
             lastName: data.lastName,
-            contact: data.contact,
             address: data.address,
+            contact: data.mobileNumber,
             docID: doc.id,
           });
         });
       });
-  };
+  }
 
-  updateUserDetails = () => {
+  updateData() {
     db.collection("users").doc(this.state.docID).update({
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       address: this.state.address,
       contact: this.state.contact,
     });
-    Alert.alert("Profile Updated!!");
-  };
+  }
 
   componentDidMount() {
-    this.getUserDetails();
+    this.getData();
   }
 
   render() {
     return (
-      <View style={styles.profileContainer}>
-        <MyHeader title="Settings" navigation={this.props.navigation}/>
-        <View style={styles.container}>
+      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <MyHeader title="Settings" navigation={this.props.navigation} />
+        <View style={{ flex: 1, width: "100%", alignItems: "center" }}>
           <TextInput
             style={styles.formTextInput}
-            placeholder="First Name"
+            placeholder={"First Name"}
             maxLength={8}
             onChangeText={(text) => {
               this.setState({
                 firstName: text,
               });
             }}
-          ></TextInput>
+            value={this.state.firstName}
+          />
           <TextInput
             style={styles.formTextInput}
-            placeholder="Last Name"
+            placeholder={"Last Name"}
             maxLength={8}
             onChangeText={(text) => {
               this.setState({
                 lastName: text,
               });
             }}
-          ></TextInput>
+            value={this.state.lastName}
+          />
           <TextInput
             style={styles.formTextInput}
-            placeholder="Contact"
+            placeholder={"Contact"}
             maxLength={10}
             keyboardType={"numeric"}
             onChangeText={(text) => {
@@ -96,24 +97,37 @@ export default class SettingScreen extends React.Component {
                 contact: text,
               });
             }}
-          ></TextInput>
+            value={this.state.contact}
+          />
           <TextInput
             style={styles.formTextInput}
-            placeholder="Address"
+            placeholder={"Address"}
             multiline={true}
             onChangeText={(text) => {
               this.setState({
                 address: text,
               });
             }}
-          ></TextInput>
+            value={this.state.address}
+          />
+          <TextInput
+            style={styles.formTextInput}
+            placeholder={"Email"}
+            keyboardType={"email-address"}
+            onChangeText={(text) => {
+              this.setState({
+                emailID: text,
+              });
+            }}
+            value={this.state.emailID}
+          />
           <TouchableOpacity
             style={styles.button}
             onPress={() => {
-              this.updateUserDetails();
+              this.updateData();
             }}
           >
-            <Text style={styles.buttonText}>Save</Text>
+            <Text> Save </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -122,21 +136,6 @@ export default class SettingScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    width: "100%",
-  },
-  profileContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 65,
-    fontWeight: "300",
-    paddingBottom: 10,
-    color: "#ff3d00",
-  },
   formTextInput: {
     width: "75%",
     height: 35,
@@ -144,30 +143,25 @@ const styles = StyleSheet.create({
     borderColor: "#ffab91",
     borderRadius: 10,
     borderWidth: 1,
-    marginTop: 10,
+    marginTop: 20,
     padding: 10,
   },
   button: {
-    width: 300,
+    width: "75%",
     height: 50,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 25,
-    backgroundColor: "#ff9800",
+    // alignSelf: 'center',
+    borderRadius: 10,
+    backgroundColor: "#ff5722",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 8,
     },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.44,
     shadowRadius: 10.32,
     elevation: 16,
-    padding: 10,
-    marginTop: 50,
-  },
-  buttonText: {
-    color: "#ffff",
-    fontWeight: "200",
-    fontSize: 20,
+    marginTop: 20,
   },
 });

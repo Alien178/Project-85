@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Header, Icon, Badge } from "react-native-elements";
-import { Text, StyleSheet, View } from "react-native";
+import { View, Text, StyeSheet, Alert } from "react-native";
 import db from "../config";
 import firebase from "firebase";
 
@@ -25,15 +25,19 @@ export default class MyHeader extends React.Component {
       });
   }
 
-  bellIconWithBadge = () => {
+  componentDidMount() {
+    this.getNumberOfUnreadNotifications();
+  }
+
+  BellIconWithBadge = () => {
     return (
       <View>
         <Icon
           name="bell"
           type="font-awesome"
-          color="#696969"
+          color="#ffffff"
           size={25}
-          onPress={() => {this.props.navigation.navigate("Notifications")}}
+          onPress={() => this.props.navigation.navigate("Notifications")}
         />
         <Badge
           value={this.state.value}
@@ -43,10 +47,6 @@ export default class MyHeader extends React.Component {
     );
   };
 
-  componentDidMount() {
-    this.getNumberOfUnreadNotifications();
-  }
-
   render() {
     return (
       <Header
@@ -54,18 +54,16 @@ export default class MyHeader extends React.Component {
           <Icon
             name="bars"
             type="font-awesome"
-            color="#696969"
-            onPress={() => {
-              this.props.navigation.toggleDrawer();
-            }}
+            color="#ffffff"
+            onPress={() => this.props.navigation.toggleDrawer()}
           />
         }
         centerComponent={{
           text: this.props.title,
-          style: { color: "#90A5A9", fontSize: 20, fontWeight: "bold" },
+          style: { color: "#ffffff", fontSize: 20, fontWeight: "bold" },
         }}
-        rightComponent={<this.bellIconWithBadge {...this.props} />}
-        backgroundColor="#EAF8FE"
+        rightComponent={<this.BellIconWithBadge {...this.props} />}
+        backgroundColor="#32867d"
       />
     );
   }
